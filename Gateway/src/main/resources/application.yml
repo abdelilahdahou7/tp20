@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: client-route
+          uri: lb://client-service
+          predicates:
+            - Path=/api/clients/**
+        - id: voiture-route
+          uri: lb://voiture-service
+          predicates:
+            - Path=/api/voitures/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
