@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  discovery:
+    image: hashicorp/consul:1.15
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    networks:
+      - tp25-network
+
+  mysql_db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: clientdb
+    ports:
+      - "3306:3306"
+    networks:
+      - tp25-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql_db
+    ports:
+      - "8088:80"
+    depends_on:
+      - mysql_db
+    networks:
+      - tp25-network
+
+  client-service:
+    build: ./client-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/clientdb?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_CLOUD_CONSUL_HOST: discovery
+    depends_on:
+      - discovery
+      - mysql_db
+    networks:
+      - tp25-network
+
+  voiture-service:
+    build: ./voiture-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/voituredb?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_CLOUD_CONSUL_HOST: discovery
+    depends_on:
+      - discovery
+      - mysql_db
+    networks:
+      - tp25-network
+
+  gateway-service:
+    build: ./Gateway
+    ports:
+      - "8888:8080"
+    environment:
+      SPRING_CLOUD_CONSUL_HOST: discovery
+    depends_on:
+      - discovery
+    networks:
+      - tp25-network
+
+networks:
+  tp25-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

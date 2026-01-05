@@ -1,28 +1,37 @@
-# TP 20 : Architecture Micro-services avec RestTemplate
+# TP 25: Containerization of Microservices with Docker & Consul
 
-Ce projet met en œuvre une architecture microservices complète utilisant Spring Boot, Eureka, et Spring Cloud Gateway.
+## Objective
+Containerize a microservices architecture (Client, Voiture, Gateway) and implement service discovery using Consul, orchestrated via Docker Compose.
 
-## 📋 Architecture
+## Architecture
+-   **Consul**: Service Discovery (Port 8500).
+-   **MySQL**: Database (Port 3306).
+-   **PHPMyAdmin**: Database Management (Port 8088).
+-   **Gateway Service**: Entry point (Port 8888).
+-   **Client Service**: Port 8081.
+-   **Voiture Service**: Port 8082.
 
-Le système est composé de :
--   **Eureka Server** (`8761`): Registre de services.
--   **API Gateway** (`8080`): Point d'entrée unique.
--   **Service Client** (`8081`): Gestion des clients.
--   **Service Voiture** (`8082`): Gestion des voitures.
+## Prerequisites
+-   Docker & Docker Compose installed.
 
-## 📸 Aperçu de l'Application
+## How to Run
+1.  **Build and Start Containers**:
+    ```bash
+    docker-compose up --build -d
+    ```
+2.  **Verify Services**:
+    -   **Consul Dashboard**: [http://localhost:8500](http://localhost:8500)
+    -   **Gateway**: [http://localhost:8888/api/clients](http://localhost:8888/api/clients)
+    -   **PHPMyAdmin**: [http://localhost:8088](http://localhost:8088)
 
-Voici une capture d'écran illustrant le fonctionnement du projet :
+## Verification Evidence
+### Consul Registration
+![Consul Dashboard](consul_evidence.png)
 
-![Aperçu du projet](capture/1.png)
+## Services Configuration
+-   **Discovery**: Consul (Replaces Eureka).
+-   **Config Import**: `spring.config.import=optional:consul:` added for Spring Boot 3 compatibility.
+-   **Base Image**: `eclipse-temurin:17-jdk-alpine` for optimized size.
 
-## 🚀 Démarrage
-
-1.  Démarrer **Eureka Server**.
-2.  Démarrer **Client Service** et **Voiture Service**.
-3.  Démarrer **Gateway Service**.
-
-## 🔗 Accès
-
--   Portail Eureka : `http://localhost:8761`
--   API Gateway : `http://localhost:8080`
+## Authors
+-   Abdelilah Dahou

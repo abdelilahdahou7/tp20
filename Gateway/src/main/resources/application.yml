@@ -16,7 +16,18 @@ spring:
           predicates:
             - Path=/api/voitures/**
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
+spring:
+  config:
+    import: "optional:consul:discovery:8500"
+  cloud:
+    consul:
+      host: discovery
+      port: 8500
+      discovery:
+        service-name: gateway-service
+        prefer-ip-address: true
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
